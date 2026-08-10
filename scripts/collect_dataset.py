@@ -121,11 +121,28 @@ def main() -> None:
                         help="Reprocess even if already successfully processed.")
     parser.add_argument("--with-coverage", action="store_true",
                         help="Enable coverage collection (WARNING: takes ~10x longer).")
+    parser.add_argument("--max-bugs", type=int, default=None,
+                        help="Maximum number of bugs to process per project (useful for massive projects).")
     args = parser.parse_args()
 
     bugs = TARGET_BUGS
     if args.only:
         bugs = [(p, b) for p, b in bugs if p == args.only]
+        # If the project is not in our hardcoded TARGET_BUGS, dynamically generate 1..max_bugs
+        if not bugs:
+            limit = args.max_bugs if args.max_bugs else 50
+            bugs = [(args.only, i) for i in range(1, limit + 1)]
+            
+    if args.max_bugs:
+        # Cap the bugs per project
+        capped_bugs = []
+        counts = {}
+        for p, b in bugs:
+            counts[p] = counts.get(p, 0) + 1
+            if counts[p] <= args.max_bugs:
+                capped_bugs.append((p, b))
+        bugs = capped_bugs
+
     if args.start_from:
         proj, bug_id = args.start_from[0], int(args.start_from[1])
         start_idx = next((i for i, (p, b) in enumerate(bugs) if p == proj and b == bug_id), 0)

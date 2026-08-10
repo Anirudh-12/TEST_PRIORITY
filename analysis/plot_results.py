@@ -40,6 +40,14 @@ def load_data(db_path: Path) -> pd.DataFrame:
         df_lopo = pd.read_sql_query(query, conn_lopo)
         conn_lopo.close()
         df = pd.concat([df, df_lopo], ignore_index=True)
+
+    # Try loading Static Split DB if it exists
+    static_db_path = db_path.parent / "static_results_db.sqlite"
+    if static_db_path.exists():
+        conn_static = sqlite3.connect(static_db_path)
+        df_static = pd.read_sql_query(query, conn_static)
+        conn_static.close()
+        df = pd.concat([df, df_static], ignore_index=True)
     
     # Re-aggregate to average the random seeds properly
     df = df.groupby(['policy_name', 'budget_fraction']).mean().reset_index()

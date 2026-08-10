@@ -21,7 +21,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 RESULTS_DIR = PROJECT_ROOT / "data" / "results"
 BASELINE_JSONL = RESULTS_DIR / "episode_results.jsonl"
 LOPO_JSONL = RESULTS_DIR / "lopo_episode_results.jsonl"
-
+STATIC_JSONL = RESULTS_DIR / "static_episode_results.jsonl"
 
 def load_results() -> dict[str, dict[float, dict[str, float]]]:
     """
@@ -56,6 +56,7 @@ def load_results() -> dict[str, dict[float, dict[str, float]]]:
 
     parse_file(BASELINE_JSONL)
     parse_file(LOPO_JSONL)
+    parse_file(STATIC_JSONL)
     
     # Average random baseline across seeds
     for budget in results["random"]:
