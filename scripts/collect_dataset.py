@@ -83,8 +83,14 @@ def is_already_processed(project: str, bug_id: int) -> bool:
 
 # Linux venv — all pipeline execution runs here, completely separate from
 # the Windows .venv. Lives in the Linux filesystem so no lib64 issues.
-LINUX_PYTHON = "/home/akshay/tp_venv/bin/python"
-LINUX_PROJECT = "/mnt/c/Users/aksha/OneDrive/Documents/TEST_PRIORITY"
+if sys.platform.startswith("linux"):
+    LINUX_PYTHON = sys.executable
+else:
+    LINUX_PYTHON = "/home/akshay/tp_venv/bin/python"
+if sys.platform.startswith("linux"):
+    LINUX_PROJECT = str(PROJECT_ROOT.absolute())
+else:
+    LINUX_PROJECT = "/mnt/c/Users/aksha/OneDrive/Documents/TEST_PRIORITY"
 
 
 def run_bug(project: str, bug_id: int, fp, with_coverage: bool = False, force: bool = False) -> bool:

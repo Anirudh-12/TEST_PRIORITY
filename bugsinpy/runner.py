@@ -67,7 +67,7 @@ def discover_tests(project_workspace: str, python_exe: str) -> list[str]:
     # Force-install a modern pytest + pytest-cov — upgrades any stale pinned version.
     # pytest-cov needed because many projects have `addopts = --cov=...` in setup.cfg.
     wsl(
-        f"~/.local/bin/uv pip install --python {python_exe} 'pytest>=6.0' pytest-cov --upgrade -q "
+        f"uv pip install --python {python_exe} 'pytest>=6.0' pytest-cov --upgrade -q "
         f"2>/dev/null",
         cwd=project_workspace, timeout=120,
     )
