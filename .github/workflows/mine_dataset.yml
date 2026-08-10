@@ -11,6 +11,7 @@ on:
 jobs:
   mine-dataset:
     runs-on: ubuntu-latest
+    container: ubuntu:20.04
     strategy:
       fail-fast: false
       matrix:
@@ -32,19 +33,24 @@ jobs:
           - sanic
 
     steps:
+      - name: Pre-install System Dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common curl git build-essential tzdata
+
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v2
-        with:
-          enable-cache: true
-          cache-dependency-glob: "**/requirements*.txt"
-
-      - name: Set up Python
+      - name: Install Python Versions & uv
         run: |
-          uv python install 3.10
-          uv python install 3.6 3.7 3.8 3.9
+          add-apt-repository ppa:deadsnakes/ppa -y
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y python3.6 python3.6-venv python3.6-dev \
+            python3.7 python3.7-venv python3.7-dev \
+            python3.8 python3.8-venv python3.8-dev \
+            python3.9 python3.9-venv python3.9-dev \
+            python3.10 python3.10-venv python3.10-dev
+          curl -LsSf https://astral.sh/uv/install.sh | env UV_UNMANAGED_INSTALL="/usr/local/bin" sh
 
       - name: Install dependencies
         run: |
