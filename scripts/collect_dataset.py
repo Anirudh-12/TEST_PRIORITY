@@ -101,10 +101,14 @@ def run_bug(project: str, bug_id: int, fp, with_coverage: bool = False, force: b
     if force:
         args += " --force"
         
-    wsl_cmd = ["wsl", "-d", "Ubuntu", "--", "bash", "-c",
-               f"cd {LINUX_PROJECT} && {args}"]
+    import sys
+    if sys.platform == "linux":
+        cmd = ["bash", "-c", f"cd {LINUX_PROJECT} && {args}"]
+    else:
+        cmd = ["wsl", "-d", "Ubuntu", "--", "bash", "-c", f"cd {LINUX_PROJECT} && {args}"]
+        
     result = subprocess.run(
-        wsl_cmd,
+        cmd,
         capture_output=False,  # Let stdout/stderr flow to the terminal
         cwd=str(PROJECT_ROOT),
     )
