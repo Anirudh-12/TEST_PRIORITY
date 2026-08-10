@@ -1,0 +1,55 @@
+[project]
+name = "test-priority"
+version = "0.1.0"
+description = "Budget-Constrained Online Regression Test Selection for Unseen Python Projects"
+requires-python = ">=3.11"
+dependencies = [
+    "scipy>=1.11",
+    "numpy>=1.25",
+    "pandas>=2.0",
+    "scikit-learn>=1.3",
+    "jsonschema>=4.20",
+    "rich>=13.0",
+    "click>=8.1",
+    "pyyaml>=6.0",
+    "tqdm>=4.66",
+    "matplotlib>=3.7",
+    "seaborn>=0.13",
+    "torch>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "bugsinpy",
+    "analysis",
+    "environment",
+    "policies",
+    "training",
+    "evaluation",
+    "experiments",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+norecursedirs = ["bugsinpy", "analysis", "evaluation", "environment", "policies", "training", "experiments", ".venv", "data"]
+
+[tool.uv]
+# Use copy mode instead of symlinks — prevents WSL from creating lib64 symlinks
+# in the Windows .venv that Windows then can't delete.
+link-mode = "copy"
