@@ -9,7 +9,27 @@ on:
         default: '10'
 
 jobs:
+  build-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t tp-env .
+
+      - name: Save Docker Image
+        run: docker save tp-env -o tp-env.tar
+
+      - name: Upload Docker Image Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: tp-env.tar
+          retention-days: 1
+
   mine-dataset:
+    needs: build-env
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -35,8 +55,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build Docker Image
-        run: docker build -t tp-env .
+      - name: Download Docker Image Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load Docker Image
+        run: docker load -i tp-env.tar
 
       - name: Run Data Collection
         run: |

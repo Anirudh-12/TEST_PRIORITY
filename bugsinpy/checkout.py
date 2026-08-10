@@ -99,7 +99,8 @@ def wsl(
         ":/home/akshay/.local/bin:/home/akshay/.pyenv/bin"
         f":{LINUX_BUGSINPY}/framework/bin"
     )
-    prefix = f"export PATH='{clean_path}' HOME=/home/akshay && "
+    home_dir = os.environ.get("HOME", "/home/akshay") if _INSIDE_WSL else "/home/akshay"
+    prefix = f"export PATH='{clean_path}' HOME='{home_dir}' && "
 
     if cwd:
         full_command = f"{prefix}cd '{cwd}' && {command}"
