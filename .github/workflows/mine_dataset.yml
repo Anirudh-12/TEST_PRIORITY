@@ -45,15 +45,15 @@ jobs:
         run: uv python install 3.10
 
       - name: Install dependencies
-        run: uv pip install --system -r requirements.txt
+        run: |
+          uv venv
+          uv pip install -r requirements.txt
 
       - name: Run Data Collection
         env:
-          # Tell the script where to store the huge workspaces
           BUGSINPY_WORKSPACE: ${{ github.workspace }}/bugsinpy_workspace
         run: |
-          # Use python3 directly to invoke the script since it's native linux
-          python3 scripts/collect_dataset.py --only ${{ matrix.project }} --with-coverage --max-bugs ${{ github.event.inputs.max_bugs }}
+          uv run python scripts/collect_dataset.py --only ${{ matrix.project }} --with-coverage --max-bugs ${{ github.event.inputs.max_bugs }}
 
       - name: Upload Processed Data
         uses: actions/upload-artifact@v4
