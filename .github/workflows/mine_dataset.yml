@@ -42,7 +42,9 @@ jobs:
           cache-dependency-glob: "**/requirements*.txt"
 
       - name: Set up Python
-        run: uv python install 3.10
+        run: |
+          uv python install 3.10
+          uv python install 3.6 3.7 3.8 3.9
 
       - name: Install dependencies
         run: |
