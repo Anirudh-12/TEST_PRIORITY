@@ -217,10 +217,9 @@ def install_bug(project_workspace: str, python_version: str = "3.7") -> CommandR
     pybin_dir = f"{project_workspace}/bugsinpy_pybin"
 
     # Resolve the Python executable — check system paths first, then uv-managed Pythons.
-    # uv stores its Pythons at: ~/.local/share/uv/python/cpython-<ver>-linux-x86_64-gnu/bin/python<ver>
     resolve_cmd = (
         f"python{major_minor} --version >/dev/null 2>&1 && echo \"python{major_minor}\" || "
-        f"~/.local/bin/uv python find {major_minor} 2>/dev/null || echo ''"
+        f"uv python find {major_minor} 2>/dev/null || echo ''"
     )
     resolve_result = wsl(resolve_cmd, timeout=15)
     python_exe_resolved = resolve_result.stdout.strip()
@@ -289,7 +288,7 @@ def get_installed_python(
     # Resolve the Python interpreter to use
     resolve_cmd = (
         f"python{major_minor} --version >/dev/null 2>&1 && which python{major_minor} || "
-        f"~/.local/bin/uv python find {major_minor} 2>/dev/null || echo ''"
+        f"uv python find {major_minor} 2>/dev/null || echo ''"
     )
     resolve_result = wsl(resolve_cmd, timeout=15)
     python_exe_for_venv = resolve_result.stdout.strip() or "python3"
@@ -297,9 +296,9 @@ def get_installed_python(
     # Create the venv and install requirements
     setup_cmd = (
         f"{python_exe_for_venv} -m venv {env_path} && "
-        f"~/.local/bin/uv pip install --python {env_path}/bin/python --upgrade pip -q && "
+        f"uv pip install --python {env_path}/bin/python --upgrade pip -q && "
         f"([ -f {req_file} ] && "
-        f"  ~/.local/bin/uv pip install --python {env_path}/bin/python -r {req_file} -q 2>/dev/null || true)"
+        f"  uv pip install --python {env_path}/bin/python -r {req_file} -q 2>/dev/null || true)"
     )
     setup_result = wsl(setup_cmd, cwd=project_workspace, timeout=300)
 
