@@ -47,32 +47,30 @@ class CommandResult:
 WSL_DISTRO = "Ubuntu"
 
 # Linux workspace root — repos are checked out here for fast I/O
-LINUX_WORKSPACE = "/home/akshay/bugsinpy_workspace"
+import os
+import sys
 
-# Linux path to this project (via /mnt/c/...)
-LINUX_PROJECT_ROOT = "/mnt/c/Users/aksha/OneDrive/Documents/TEST_PRIORITY"
+LINUX_WORKSPACE = os.environ.get("BUGSINPY_WORKSPACE", f"{Path.home().as_posix()}/bugsinpy_workspace")
+
+# Linux path to this project
+# On native Linux, it's just the current working directory. On Windows, it maps to WSL /mnt/c/...
+if sys.platform == "linux":
+    LINUX_PROJECT_ROOT = Path(__file__).parent.parent.absolute().as_posix()
+else:
+    LINUX_PROJECT_ROOT = "/mnt/c/Users/aksha/OneDrive/Documents/TEST_PRIORITY"
 
 # BugsInPy clone location inside WSL
 LINUX_BUGSINPY = f"{LINUX_WORKSPACE}/BugsInPy"
 
 
-# ─── WSL runner ────────────────────────────────────────────────────────────────
+# ─── WSL / Linux runner ────────────────────────────────────────────────────────
 
-def _is_inside_wsl() -> bool:
-    """Return True if this process is already running inside WSL/Linux."""
-    # WSL sets this env variable; also check /proc/version on Linux
-    import os
-    if os.environ.get("WSL_DISTRO_NAME") or os.environ.get("WSL_INTEROP"):
-        return True
-    try:
-        with open("/proc/version") as f:
-            return "microsoft" in f.read().lower()
-    except OSError:
-        return False
-
+def _is_native_linux() -> bool:
+    """Return True if this process is already running on native Linux or WSL."""
+    return sys.platform == "linux"
 
 # Cache the result — doesn't change within a process lifetime
-_INSIDE_WSL: bool = _is_inside_wsl()
+_INSIDE_WSL: bool = _is_native_linux()
 
 
 def wsl(

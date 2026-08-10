@@ -1,0 +1,64 @@
+name: Mine BugsInPy Dataset
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_bugs:
+        description: 'Maximum bugs to mine per project'
+        required: true
+        default: '10'
+
+jobs:
+  mine-dataset:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: 
+          - httpie
+          - thefuck
+          - PySnooper
+          - ansible
+          - cookiecutter
+          - keras
+          - luigi
+          - matplotlib
+          - pandas
+          - scrapy
+          - spacy
+          - tornado
+          - youtube-dl
+          - fastapi
+          - sanic
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v2
+        with:
+          enable-cache: true
+          cache-dependency-glob: "**/requirements*.txt"
+
+      - name: Set up Python
+        run: uv python install 3.10
+
+      - name: Install dependencies
+        run: uv pip install --system -r requirements.txt
+
+      - name: Run Data Collection
+        env:
+          # Tell the script where to store the huge workspaces
+          BUGSINPY_WORKSPACE: ${{ github.workspace }}/bugsinpy_workspace
+        run: |
+          # Use python3 directly to invoke the script since it's native linux
+          python3 scripts/collect_dataset.py --only ${{ matrix.project }} --with-coverage --max-bugs ${{ github.event.inputs.max_bugs }}
+
+      - name: Upload Processed Data
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: processed-data-${{ matrix.project }}
+          path: data/processed/${{ matrix.project }}/
+          retention-days: 7
